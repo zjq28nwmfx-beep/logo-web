@@ -15,12 +15,12 @@ export async function GET() {
 
   try {
     const response = await openai.images.generate({
-      model: "dall-e-3",
-      prompt: goldenPrompt,
-      n: 1,
-      size: "1024x1024",
-      quality: "standard"
-    });
+        model: "gpt-image-2",     // 👈 换成 2026 最新一代图像模型
+        prompt: goldenPrompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "medium"         // 👈 配合新版模型，将画质改为 medium
+      });
 
     return NextResponse.json({ 
       success: true, 
