@@ -7,7 +7,6 @@ export async function POST(req: Request) {
   try {
     const { brandName, industry, elements } = await req.json();
 
-    // 🚀 商业级黄金提示词模板隔离架构
     const goldenPrompt = `A professional, clean, and minimalist vector logo design for a ${industry} named '${brandName}'. 
     The design should subtly incorporate the following elements: ${elements}. 
     Style constraints: Flat vector graphic, clean and minimalist lines. Solid pure white background, no gradients, 
@@ -22,21 +21,30 @@ export async function POST(req: Request) {
       quality: "medium"
     });
 
-    const imageUrl = response.data?.[0]?.url;
-    if (!imageUrl) {
-      return NextResponse.json({ success: false, error: "AI 未返回图片链接" }, { status: 500 });
+    const imgData = response.data?.[0];
+    if (!imgData) {
+      return NextResponse.json({ success: false, error: "AI 未返回任何数据" }, { status: 500 });
     }
 
-    // 🚀 核心黑科技：服务器在后端抓取图片并将其强转为 Base64 PNG 编码
-    // 这样能彻底消除跨域问题，并确保用户下载、长按保存下来的绝对是标准的 PNG 格式
-    const imageRes = await fetch(imageUrl);
-    const arrayBuffer = await imageRes.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Image = `data:image/png;base64,${buffer.toString("base64")}`;
+    let finalBase64Image = "";
+
+    // 🚀 智能兼容逻辑：无论 AI 给的是底层数据还是链接，统统接得住！
+    if (imgData.b64_json) {
+      // 1. 如果 AI 直接给了底层数据，直接拼成 PNG 格式
+      finalBase64Image = `data:image/png;base64,${imgData.b64_json}`;
+    } else if (imgData.url) {
+      // 2. 如果 AI 给的是网址链接，就在服务器后台下载并强转成 PNG 格式
+      const imageRes = await fetch(imgData.url);
+      const arrayBuffer = await imageRes.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      finalBase64Image = `data:image/png;base64,${buffer.toString("base64")}`;
+    } else {
+      return NextResponse.json({ success: false, error: "AI 返回格式异常" }, { status: 500 });
+    }
 
     return NextResponse.json({ 
       success: true, 
-      image: base64Image 
+      image: finalBase64Image 
     });
 
   } catch (error: any) {
