@@ -14,20 +14,22 @@ export async function POST(req: Request) {
     highly scalable, centered composition, no photo-realistic details, no complex backgrounds. 
     The text '${brandName}' must be visually prominent and elegantly integrated into the overall aesthetic.`;
 
+    // 调用 AI 引擎，去除了会报错的 response_format 参数
     const response = await openai.images.generate({
-      model: "gpt-image-2", // 确保使用最新的 2026 模型
+      model: "gpt-image-2", 
       prompt: goldenPrompt,
       n: 1,
       size: "1024x1024",
-      quality: "medium",
-      response_format: "b64_json" // 直接返回数据流，更安全
+      quality: "medium"
     });
 
-    const base64Data = response.data?.[0]?.b64_json;
+    // ✅ 完美兼容：无论官方返回 URL 还是 Base64 数据流，我们都能稳稳接住
+    const imgData = response.data?.[0];
+    const finalImage = imgData?.url || (imgData?.b64_json ? `data:image/png;base64,${imgData.b64_json}` : "");
 
     return NextResponse.json({ 
       success: true, 
-      image: `data:image/png;base64,${base64Data}` 
+      image: finalImage 
     });
 
   } catch (error: any) {
