@@ -1,0 +1,16 @@
+{
+    "name": "云象 AI | 专属 Logo 生成",
+    "short_name": "云象 AI",
+    "description": "2026 最新一代 AI 极简线稿 Logo 生成引擎",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "icons": [
+      {
+        "src": "/icon.png",
+        "sizes": "1024x1024",
+        "type": "image/png"
+      }
+    ]
+  }
