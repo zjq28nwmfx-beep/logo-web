@@ -10,6 +10,9 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPayModal, setShowPayModal] = useState(false);
   
+  // 🚀 新增：高级成功状态弹窗
+  const [successMsg, setSuccessMsg] = useState(""); 
+  
   const [phoneInput, setPhoneInput] = useState("");
   const [smsInput, setSmsInput] = useState("");
   const [countdown, setCountdown] = useState(0);
@@ -84,7 +87,8 @@ export default function Home() {
     setTimeout(() => {
       setIsSendingSms(false);
       setCountdown(60); 
-      alert("【演示模式】验证码已发送，测试请输入：1234");
+      // 这里的验证码提示保留原生，因为很快会接真实短信
+      alert("【演示模式】验证码已发送，测试请输入：1234"); 
     }, 800);
   };
 
@@ -98,12 +102,13 @@ export default function Home() {
       let finalCredits = 0;
       if (user) {
         finalCredits = user.credits;
-        alert(`欢迎回来！当前积分: ${user.credits}`);
+        // 🚀 替换丑陋的 alert，使用高级文案
+        setSuccessMsg(`欢迎归来，您当前拥有 ${user.credits} 算力积分`);
       } else {
         const { data: newUser, error: insertError } = await supabase.from('users').insert([{ phone: phoneInput, credits: 10 }]).select().single();
         if (insertError) throw insertError;
         finalCredits = newUser.credits;
-        alert("注册成功！已赠送 10 积分体验金。");
+        setSuccessMsg("账号创建成功，已为您奉上 10 积分体验金");
       }
 
       setUserPhone(phoneInput);
@@ -114,7 +119,6 @@ export default function Home() {
       localStorage.setItem("yunxiang_login_time", new Date().getTime().toString());
 
     } catch (e: any) {
-      // 🚀 改进报错：如果真的连不上，把具体原因弹出来
       if (e.code !== 'PGRST116') {
         alert("数据库异常: " + (e.message || JSON.stringify(e)));
       }
@@ -122,7 +126,7 @@ export default function Home() {
   };
 
   const handleLogout = () => {
-    if(confirm("确定要退出登录吗？")) {
+    if(confirm("确定要退出当前账号吗？")) {
       localStorage.removeItem("yunxiang_user_phone");
       localStorage.removeItem("yunxiang_login_time");
       setIsLoggedIn(false);
@@ -132,13 +136,13 @@ export default function Home() {
   };
 
   const handleMockPay = (channel: string, amount: number, addCredits: number) => {
-    alert(`即将跳转【${channel}】支付 ${amount} 元...\n(当前为搭建阶段，支付成功后将自动到账 ${addCredits} 积分)`);
+    // 充值成功也用高级弹窗
     setTimeout(async () => {
       const newBalance = credits + addCredits;
       setCredits(newBalance);
       await supabase.from('users').update({ credits: newBalance }).eq('phone', userPhone);
-      alert("支付成功！积分已到账。");
       setShowPayModal(false);
+      setSuccessMsg(`支付成功！${addCredits} 积分已实时到账`);
     }, 1500);
   };
 
@@ -187,17 +191,16 @@ export default function Home() {
   };
 
   return (
-    <main style={{ minHeight: "100vh", backgroundColor: "#000", color: "#fff", padding: "40px 20px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+    <main style={{ minHeight: "100vh", backgroundColor: "#000", color: "#fff", padding: "40px 20px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", position: "relative" }}>
       
+      {/* 顶部钱包卡片 */}
       <div style={{ background: "#1a1a1a", padding: "15px 20px", borderRadius: "16px", marginBottom: "40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
             <span style={{ color: "#888", fontSize: "12px" }}>
               {isLoggedIn ? `📱 ${userPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}` : "未登录账户"}
             </span>
-            {isLoggedIn && (
-              <span onClick={handleLogout} style={{ color: "#ff4444", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}>退出</span>
-            )}
+            {/* 🚀 删除了这里显眼的退出按钮 */}
           </div>
           <span style={{ fontSize: "18px", fontWeight: "bold" }}>
             {isLoggedIn ? `💎 ${credits} 积分` : "💎 -- 积分"}
@@ -218,7 +221,7 @@ export default function Home() {
       <h1 style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "8px" }}>创作中心</h1>
       <p style={{ color: "#888", fontSize: "14px", marginBottom: "30px" }}>由 GPT-Image-2 驱动的商业级 Logo 引擎</p>
 
-      {/* 🚀 修复：加回所有的 placeholder (灰字) */}
+      {/* 表单区域 */}
       <div style={{ display: "flex", flexDirection: "column", gap: "20px", opacity: loading ? 0.3 : 1, pointerEvents: loading ? "none" : "auto" }}>
         <div>
           <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>品牌名称</label>
@@ -242,6 +245,14 @@ export default function Home() {
         </div>
       )}
 
+      {/* 🚀 新增：页面最底部的低调退出按钮 */}
+      {isLoggedIn && !loading && (
+        <div style={{ textAlign: "center", marginTop: "80px", paddingBottom: "20px" }}>
+          <span onClick={handleLogout} style={{ color: "#333", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}>退出账号</span>
+        </div>
+      )}
+
+      {/* 登录弹窗 */}
       {showAuthModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" }}>
           <div style={{ background: "#161616", border: "1px solid #222", width: "100%", maxWidth: "360px", padding: "30px 24px", borderRadius: "24px", position: "relative" }}>
@@ -258,6 +269,7 @@ export default function Home() {
         </div>
       )}
 
+      {/* 充值收银台弹窗 */}
       {showPayModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "flex-end", zIndex: 1000 }}>
           <div style={{ background: "#161616", width: "100%", maxWidth: "500px", padding: "30px 20px 50px 20px", borderTopLeftRadius: "24px", borderTopRightRadius: "24px", position: "relative" }}>
@@ -279,6 +291,22 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* 🚀 新增：高级成功状态弹窗 (代替原生 alert) */}
+      {successMsg && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(5px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1001, padding: "20px" }}>
+          <div style={{ background: "#111", border: "1px solid #333", width: "100%", maxWidth: "300px", padding: "30px 24px", borderRadius: "20px", textAlign: "center", boxShadow: "0 20px 40px rgba(0,0,0,0.5)" }}>
+            <div style={{ fontSize: "40px", marginBottom: "16px" }}>✨</div>
+            <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "12px", color: "#fff" }}>登录成功</h3>
+            <p style={{ color: "#aaa", fontSize: "14px", marginBottom: "28px", lineHeight: "1.5" }}>{successMsg}</p>
+            <button onClick={() => setSuccessMsg("")} style={{ width: "100%", padding: "14px", borderRadius: "12px", background: "#fff", color: "#000", border: "none", fontSize: "15px", fontWeight: "bold", cursor: "pointer" }}>
+              开启创作之旅
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 进度条遮罩层 */}
       {loading && (<div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 999 }}><div style={{ width: "85%", maxWidth: "400px", textAlign: "center" }}><div style={{ fontSize: "64px", fontWeight: "bold", color: "#fff", marginBottom: "10px", fontFamily: "monospace" }}>{progress}%</div><p style={{ color: "#888", fontSize: "14px", marginBottom: "30px", height: "20px" }}>{statusText}</p><div style={{ background: "#222", height: "6px", borderRadius: "3px", overflow: "hidden" }}><div style={{ height: "100%", background: "#fff", width: `${progress}%`, transition: "width 0.4s ease-out" }}></div></div></div></div>)}
     </main>
   );
