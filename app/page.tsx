@@ -25,7 +25,7 @@ export default function Home() {
   const [statusText, setStatusText] = useState("");
   const [resultImage, setResultImage] = useState("");
 
-  const statusMessages = ["正在分配云端算力...", "正在解析品牌调性...", "正在构建基础轮廓...", "正在融合定制元素...", "正在进行细节打磨...", "图片即将生成，请稍候..."];
+  const statusMessages = ["正在汇聚设计灵感...", "正在解析品牌调性...", "正在构建视觉母版...", "正在融入定制元素...", "正在打磨最终细节...", "作品即将呈现..."];
 
   useEffect(() => {
     const checkLoginState = async () => {
@@ -99,12 +99,12 @@ export default function Home() {
       let finalCredits = 0;
       if (user) {
         finalCredits = user.credits;
-        setSuccessMsg(`欢迎归来，您当前拥有 ${user.credits} 算力积分`);
+        setSuccessMsg(`欢迎归来，您当前拥有 ${user.credits} 灵感`);
       } else {
         const { data: newUser, error: insertError } = await supabase.from('users').insert([{ phone: phoneInput, credits: 10 }]).select().single();
         if (insertError) throw insertError;
         finalCredits = newUser.credits;
-        setSuccessMsg("账号创建成功，已为您奉上 10 积分体验金");
+        setSuccessMsg("账号创建成功，已为您奉上 10 灵感作为见面礼");
       }
 
       setUserPhone(phoneInput);
@@ -135,7 +135,7 @@ export default function Home() {
       setCredits(newBalance);
       await supabase.from('users').update({ credits: newBalance }).eq('phone', userPhone);
       setShowPayModal(false);
-      setSuccessMsg(`支付成功！${addCredits} 积分已实时到账`);
+      setSuccessMsg(`支付成功！${addCredits} 灵感已实时汇入`);
     }, 1500);
   };
 
@@ -155,7 +155,7 @@ export default function Home() {
       const data = await res.json();
       if (data.success) {
         setProgress(100); 
-        setStatusText("生成完毕！");
+        setStatusText("作品生成完毕");
         const newBalance = credits - 10;
         setCredits(newBalance); 
         await supabase.from('users').update({ credits: newBalance }).eq('phone', userPhone);
@@ -183,81 +183,77 @@ export default function Home() {
     document.body.removeChild(link);
   };
 
-  // 提取复用的输入框样式
-  const inputStyle = { width: "100%", background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "16px", padding: "18px 20px", color: "#fff", fontSize: "15px", outline: "none", transition: "all 0.3s ease", backdropFilter: "blur(10px)", letterSpacing: "0.5px" };
+  // 极简输入框样式
+  const inputStyle = { width: "100%", background: "transparent", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "10px", padding: "16px 20px", color: "#fff", fontSize: "14px", outline: "none", transition: "all 0.3s ease", letterSpacing: "1px" };
 
   return (
-    <main style={{ minHeight: "100vh", backgroundColor: "#030303", backgroundImage: "radial-gradient(circle at 50% 0%, rgba(30, 30, 35, 1) 0%, rgba(3, 3, 3, 1) 70%)", color: "#fff", padding: "40px 20px", fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif", position: "relative", overflow: "hidden" }}>
+    <main style={{ minHeight: "100vh", backgroundColor: "#000", backgroundImage: "radial-gradient(circle at 50% -10%, rgba(30, 30, 35, 1) 0%, rgba(0, 0, 0, 1) 60%)", color: "#fff", padding: "40px 20px", fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif", position: "relative", overflow: "hidden" }}>
       
-      {/* 环境光晕背景饰品 */}
-      <div style={{ position: "absolute", top: "-100px", left: "-100px", width: "300px", height: "300px", background: "radial-gradient(circle, rgba(234, 179, 8, 0.05) 0%, transparent 70%)", filter: "blur(40px)", zIndex: 0, pointerEvents: "none" }}></div>
-      <div style={{ position: "absolute", top: "20%", right: "-150px", width: "400px", height: "400px", background: "radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%)", filter: "blur(60px)", zIndex: 0, pointerEvents: "none" }}></div>
-
-      <div style={{ position: "relative", zIndex: 1, maxWidth: "600px", margin: "0 auto" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: "560px", margin: "0 auto" }}>
         
-        {/* 顶部钱包卡片 (高奢毛玻璃) */}
-        <div style={{ background: "rgba(25, 25, 25, 0.4)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255, 255, 255, 0.08)", padding: "18px 24px", borderRadius: "20px", marginBottom: "50px", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 10px 40px rgba(0,0,0,0.3)" }}>
+        {/* 高定版顶部钱包 */}
+        <div style={{ background: "rgba(10, 10, 10, 0.4)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", border: "1px solid rgba(255, 255, 255, 0.06)", padding: "16px 24px", borderRadius: "16px", marginBottom: "60px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <span style={{ color: "#a1a1aa", fontSize: "12px", letterSpacing: "1px" }}>
-                {isLoggedIn ? `📱 ${userPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}` : "未登录"}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+              <span style={{ color: "#71717a", fontSize: "11px", letterSpacing: "1px" }}>
+                {isLoggedIn ? `${userPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}` : "未登录"}
               </span>
             </div>
-            <span style={{ fontSize: "22px", fontWeight: "600", letterSpacing: "0.5px", background: "linear-gradient(135deg, #fff 0%, #a1a1aa 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              {isLoggedIn ? `💎 ${credits} 算力` : "💎 -- 算力"}
+            <span style={{ fontSize: "20px", fontWeight: "300", letterSpacing: "1px" }}>
+              {isLoggedIn ? <><span style={{ color: "#e4e4e7" }}>✦</span> {credits} <span style={{ fontSize: "14px", color: "#71717a" }}>灵感</span></> : "✦ -- 灵感"}
             </span>
           </div>
           
           {isLoggedIn ? (
-            <button onClick={() => setShowPayModal(true)} style={{ padding: "10px 20px", background: "linear-gradient(135deg, #E6C27A 0%, #C79A42 100%)", color: "#111", border: "none", borderRadius: "12px", fontSize: "13px", fontWeight: "700", boxShadow: "0 4px 15px rgba(199, 154, 66, 0.2)", cursor: "pointer", letterSpacing: "0.5px" }}>
-              补充算力
+            <button onClick={() => setShowPayModal(true)} style={{ padding: "10px 18px", background: "rgba(255,255,255,0.05)", color: "#e4e4e7", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px", transition: "all 0.3s ease" }}>
+              汲取灵感
             </button>
           ) : (
-            <button onClick={() => setShowAuthModal(true)} style={{ padding: "10px 20px", background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "12px", fontSize: "13px", fontWeight: "500", cursor: "pointer", backdropFilter: "blur(10px)" }}>
-              登录 / 注册
+            <button onClick={() => setShowAuthModal(true)} style={{ padding: "10px 18px", background: "#fff", color: "#000", border: "none", borderRadius: "10px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}>
+              登录体验
             </button>
           )}
         </div>
 
         {/* 标题区域 */}
-        <div style={{ marginBottom: "40px", textAlign: "center" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "700", marginBottom: "12px", letterSpacing: "1px", background: "linear-gradient(135deg, #fff 0%, #888 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>灵感创构</h1>
-          <p style={{ color: "#71717a", fontSize: "13px", letterSpacing: "1px", textTransform: "uppercase" }}>Powered by GPT-Image-2 Engine</p>
+        <div style={{ marginBottom: "50px", textAlign: "center" }}>
+          <h1 style={{ fontSize: "28px", fontWeight: "400", marginBottom: "14px", letterSpacing: "4px", color: "#fff" }}>灵感创构</h1>
+          <p style={{ color: "#52525b", fontSize: "11px", letterSpacing: "2px", textTransform: "uppercase" }}>Powered by GPT-Image-2 Engine</p>
         </div>
 
         {/* 表单区域 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px", opacity: loading ? 0.3 : 1, pointerEvents: loading ? "none" : "auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "28px", opacity: loading ? 0.3 : 1, pointerEvents: loading ? "none" : "auto" }}>
           <div>
-            <label style={{ display: "block", color: "#a1a1aa", fontSize: "13px", marginBottom: "10px", marginLeft: "4px", letterSpacing: "0.5px" }}>品牌名称</label>
+            <label style={{ display: "block", color: "#71717a", fontSize: "12px", marginBottom: "10px", marginLeft: "4px", letterSpacing: "1px" }}>品牌名称</label>
             <input placeholder="例如：云象咖啡" value={brandName} onChange={(e) => setBrandName(e.target.value)} style={inputStyle} />
           </div>
           <div>
-            <label style={{ display: "block", color: "#a1a1aa", fontSize: "13px", marginBottom: "10px", marginLeft: "4px", letterSpacing: "0.5px" }}>所属行业</label>
+            <label style={{ display: "block", color: "#71717a", fontSize: "12px", marginBottom: "10px", marginLeft: "4px", letterSpacing: "1px" }}>所属行业</label>
             <input placeholder="例如：精品咖啡、科技初创" value={industry} onChange={(e) => setIndustry(e.target.value)} style={inputStyle} />
           </div>
           <div>
-            <label style={{ display: "block", color: "#a1a1aa", fontSize: "13px", marginBottom: "10px", marginLeft: "4px", letterSpacing: "0.5px" }}>核心意象 (选填)</label>
+            <label style={{ display: "block", color: "#71717a", fontSize: "12px", marginBottom: "10px", marginLeft: "4px", letterSpacing: "1px" }}>核心意象 (选填)</label>
             <input placeholder="大象, 云朵, 极简线条" value={elements} onChange={(e) => setElements(e.target.value)} style={inputStyle} />
           </div>
-          <button onClick={handleGenerate} style={{ marginTop: "16px", padding: "20px", borderRadius: "16px", background: "linear-gradient(135deg, #ffffff 0%, #e4e4e7 100%)", color: "#000", border: "none", fontSize: "16px", fontWeight: "700", cursor: "pointer", letterSpacing: "1px", boxShadow: "0 8px 25px rgba(255,255,255,0.15)", transition: "all 0.3s ease" }}>
-            {isLoggedIn ? "开始生成 (消耗 10 算力)" : "✨ 开启创作 (首单免费)"}
+          <button onClick={handleGenerate} style={{ marginTop: "20px", padding: "18px", borderRadius: "12px", background: "linear-gradient(180deg, #ffffff 0%, #d4d4d8 100%)", color: "#000", border: "none", fontSize: "14px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px", boxShadow: "0 4px 20px rgba(255,255,255,0.1)", transition: "all 0.3s ease" }}>
+            {isLoggedIn ? "开始生成 (消耗 10 灵感)" : "✦ 开启创作 (首单免费)"}
           </button>
         </div>
 
         {resultImage && !loading && (
-          <div style={{ marginTop: "50px", textAlign: "center" }}>
-            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "24px", padding: "16px", display: "inline-block", backdropFilter: "blur(10px)" }}>
-              <img src={resultImage} style={{ width: "100%", maxWidth: "340px", borderRadius: "16px", boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }} alt="Result" />
+          <div style={{ marginTop: "60px", textAlign: "center" }}>
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "20px", padding: "12px", display: "inline-block", backdropFilter: "blur(10px)" }}>
+              <img src={resultImage} style={{ width: "100%", maxWidth: "340px", borderRadius: "12px" }} alt="Result" />
             </div>
-            <button onClick={handleDownload} style={{ display: "block", margin: "30px auto 0 auto", padding: "16px 32px", background: "rgba(25,25,25,0.8)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", fontSize: "14px", fontWeight: "600", cursor: "pointer", backdropFilter: "blur(10px)" }}>
-              📥 下载专属母本 (PNG)
+            <button onClick={handleDownload} style={{ display: "block", margin: "30px auto 0 auto", padding: "14px 28px", background: "rgba(255,255,255,0.05)", color: "#e4e4e7", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", fontSize: "13px", fontWeight: "400", cursor: "pointer", letterSpacing: "1px" }}>
+              下载源文件 (PNG)
             </button>
           </div>
         )}
 
         {isLoggedIn && !loading && (
-          <div style={{ textAlign: "center", marginTop: "100px", paddingBottom: "30px" }}>
-            <span onClick={handleLogout} style={{ color: "#52525b", fontSize: "12px", cursor: "pointer", transition: "color 0.3s ease", letterSpacing: "0.5px" }}>退出当前账号</span>
+          <div style={{ textAlign: "center", marginTop: "80px", paddingBottom: "30px" }}>
+            <span onClick={handleLogout} style={{ color: "#3f3f46", fontSize: "11px", cursor: "pointer", letterSpacing: "1px" }}>退出当前账号</span>
           </div>
         )}
 
@@ -265,60 +261,60 @@ export default function Home() {
 
       {/* 极简登录弹窗 */}
       {showAuthModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" }}>
-          <div style={{ background: "rgba(20,20,20,0.8)", border: "1px solid rgba(255,255,255,0.08)", width: "100%", maxWidth: "380px", padding: "40px 30px", borderRadius: "28px", position: "relative", boxShadow: "0 20px 50px rgba(0,0,0,0.5)" }}>
-            <button onClick={() => setShowAuthModal(false)} style={{ position: "absolute", top: "20px", right: "24px", background: "none", border: "none", color: "#71717a", fontSize: "24px", cursor: "pointer" }}>×</button>
-            <h3 style={{ fontSize: "22px", fontWeight: "600", marginBottom: "8px", letterSpacing: "0.5px" }}>身份验证</h3>
-            <p style={{ color: "#71717a", fontSize: "13px", marginBottom: "32px", letterSpacing: "0.5px" }}>未注册手机号验证后将自动分配算力账户</p>
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" }}>
+          <div style={{ background: "rgba(15,15,15,0.9)", border: "1px solid rgba(255,255,255,0.08)", width: "100%", maxWidth: "360px", padding: "40px 30px", borderRadius: "20px", position: "relative" }}>
+            <button onClick={() => setShowAuthModal(false)} style={{ position: "absolute", top: "20px", right: "24px", background: "none", border: "none", color: "#52525b", fontSize: "24px", cursor: "pointer", fontWeight: "300" }}>×</button>
+            <h3 style={{ fontSize: "18px", fontWeight: "400", marginBottom: "10px", letterSpacing: "1px" }}>身份验证</h3>
+            <p style={{ color: "#71717a", fontSize: "12px", marginBottom: "32px", letterSpacing: "1px" }}>新设备验证后将自动开通灵感账户</p>
             <input type="tel" placeholder="输入手机号码" value={phoneInput} maxLength={11} onChange={(e) => setPhoneInput(e.target.value)} style={{ ...inputStyle, marginBottom: "16px" }} />
             <div style={{ display: "flex", gap: "12px", marginBottom: "32px" }}>
               <input placeholder="验证码" value={smsInput} maxLength={4} onChange={(e) => setSmsInput(e.target.value)} style={{ ...inputStyle, flex: 1 }} />
-              <button onClick={handleSendCode} disabled={countdown > 0 || isSendingSms} style={{ width: "110px", borderRadius: "16px", background: countdown > 0 ? "rgba(255,255,255,0.05)" : "#fff", color: countdown > 0 ? "#71717a" : "#000", border: "none", fontSize: "13px", fontWeight: "600", cursor: countdown > 0 ? "default" : "pointer" }}>{countdown > 0 ? `${countdown}s` : "获取验证码"}</button>
+              <button onClick={handleSendCode} disabled={countdown > 0 || isSendingSms} style={{ width: "110px", borderRadius: "10px", background: countdown > 0 ? "rgba(255,255,255,0.03)" : "#fff", color: countdown > 0 ? "#52525b" : "#000", border: "none", fontSize: "12px", fontWeight: "500", cursor: countdown > 0 ? "default" : "pointer", letterSpacing: "1px" }}>{countdown > 0 ? `${countdown}s` : "获取验证码"}</button>
             </div>
-            <button onClick={handleVerifyLogin} style={{ width: "100%", padding: "18px", borderRadius: "16px", background: "#fff", color: "#000", border: "none", fontSize: "15px", fontWeight: "600", cursor: "pointer", letterSpacing: "1px" }}>立即验证</button>
+            <button onClick={handleVerifyLogin} style={{ width: "100%", padding: "16px", borderRadius: "10px", background: "linear-gradient(180deg, #ffffff 0%, #d4d4d8 100%)", color: "#000", border: "none", fontSize: "13px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}>立即验证</button>
           </div>
         </div>
       )}
 
-      {/* 高奢收银台弹窗 */}
+      {/* 极简收银台弹窗 */}
       {showPayModal && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", display: "flex", justifyContent: "center", alignItems: "flex-end", zIndex: 1000 }}>
-          <div style={{ background: "rgba(20,20,22,0.95)", width: "100%", maxWidth: "600px", padding: "40px 24px 60px 24px", borderTopLeftRadius: "32px", borderTopRightRadius: "32px", borderTop: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
-            <button onClick={() => setShowPayModal(false)} style={{ position: "absolute", top: "24px", right: "28px", background: "none", border: "none", color: "#71717a", fontSize: "28px", cursor: "pointer" }}>×</button>
-            <h3 style={{ fontSize: "22px", fontWeight: "600", marginBottom: "6px", letterSpacing: "1px" }}>补充算力网络</h3>
-            <p style={{ color: "#71717a", fontSize: "13px", marginBottom: "32px", letterSpacing: "0.5px" }}>企业级 GPU 专属通道，保障灵感不间断</p>
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)", display: "flex", justifyContent: "center", alignItems: "flex-end", zIndex: 1000 }}>
+          <div style={{ background: "rgba(15,15,15,0.95)", width: "100%", maxWidth: "600px", padding: "40px 24px 60px 24px", borderTopLeftRadius: "24px", borderTopRightRadius: "24px", borderTop: "1px solid rgba(255,255,255,0.08)", position: "relative" }}>
+            <button onClick={() => setShowPayModal(false)} style={{ position: "absolute", top: "24px", right: "28px", background: "none", border: "none", color: "#52525b", fontSize: "28px", cursor: "pointer", fontWeight: "200" }}>×</button>
+            <h3 style={{ fontSize: "18px", fontWeight: "400", marginBottom: "8px", letterSpacing: "1px" }}>补充灵感源泉</h3>
+            <p style={{ color: "#71717a", fontSize: "12px", marginBottom: "32px", letterSpacing: "1px" }}>企业级 GPU 专属算力通道</p>
             
             <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "32px" }}>
-              <div style={{ border: "1px solid rgba(230, 194, 122, 0.3)", background: "rgba(230, 194, 122, 0.03)", borderRadius: "20px", padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><div style={{ fontSize: "17px", fontWeight: "600", color: "#E6C27A", marginBottom: "6px", letterSpacing: "0.5px" }}>初创体验包 (5次)</div><div style={{ fontSize: "13px", color: "#71717a" }}>包含 50 算力积分</div></div>
-                <div style={{ display: "flex", gap: "10px" }}><button onClick={() => handleMockPay("微信", 9.9, 50)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "10px 16px", borderRadius: "12px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>微信 ￥9.9</button><button onClick={() => handleMockPay("支付宝", 9.9, 50)} style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "none", padding: "10px 16px", borderRadius: "12px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>支付宝</button></div>
+              <div style={{ border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.03)", borderRadius: "16px", padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div><div style={{ fontSize: "15px", fontWeight: "400", color: "#fff", marginBottom: "6px", letterSpacing: "1px" }}>初创体验包 (5次)</div><div style={{ fontSize: "12px", color: "#71717a", letterSpacing: "1px" }}>包含 50 灵感</div></div>
+                <div style={{ display: "flex", gap: "10px" }}><button onClick={() => handleMockPay("微信", 9.9, 50)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}>微信 ￥9.9</button><button onClick={() => handleMockPay("支付宝", 9.9, 50)} style={{ background: "rgba(255,255,255,0.05)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: "400", cursor: "pointer", letterSpacing: "1px" }}>支付宝</button></div>
               </div>
-              <div style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)", borderRadius: "20px", padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><div style={{ fontSize: "17px", fontWeight: "600", color: "#fff", marginBottom: "6px", letterSpacing: "0.5px" }}>商业标准版 (20次)</div><div style={{ fontSize: "13px", color: "#71717a" }}>包含 200 算力积分</div></div>
-                <div style={{ display: "flex", gap: "10px" }}><button onClick={() => handleMockPay("微信", 29.9, 200)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "10px 16px", borderRadius: "12px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>微信 ￥29.9</button><button onClick={() => handleMockPay("支付宝", 29.9, 200)} style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "none", padding: "10px 16px", borderRadius: "12px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}>支付宝</button></div>
+              <div style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.01)", borderRadius: "16px", padding: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div><div style={{ fontSize: "15px", fontWeight: "400", color: "#a1a1aa", marginBottom: "6px", letterSpacing: "1px" }}>商业标准版 (20次)</div><div style={{ fontSize: "12px", color: "#71717a", letterSpacing: "1px" }}>包含 200 灵感</div></div>
+                <div style={{ display: "flex", gap: "10px" }}><button onClick={() => handleMockPay("微信", 29.9, 200)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "10px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}>微信 ￥29.9</button><button onClick={() => handleMockPay("支付宝", 29.9, 200)} style={{ background: "rgba(255,255,255,0.05)", color: "#fff", border: "1px solid rgba(255,255,255,0.1)", padding: "9px 14px", borderRadius: "8px", fontSize: "12px", fontWeight: "400", cursor: "pointer", letterSpacing: "1px" }}>支付宝</button></div>
               </div>
             </div>
-            <p style={{ color: "#52525b", fontSize: "12px", textAlign: "center", letterSpacing: "0.5px" }}>购买即同意《云象数字服务协议》，虚拟算力资产不支持退款</p>
+            <p style={{ color: "#3f3f46", fontSize: "11px", textAlign: "center", letterSpacing: "1px" }}>购买即同意服务协议，虚拟数字资产不支持退款</p>
           </div>
         </div>
       )}
 
-      {/* 成功状态高奢弹窗 */}
+      {/* 成功状态弹窗 */}
       {successMsg && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(15px)", WebkitBackdropFilter: "blur(15px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1001, padding: "20px" }}>
-          <div style={{ background: "rgba(20,20,20,0.8)", border: "1px solid rgba(255,255,255,0.1)", width: "100%", maxWidth: "320px", padding: "40px 30px", borderRadius: "28px", textAlign: "center", boxShadow: "0 30px 60px rgba(0,0,0,0.6)" }}>
-            <div style={{ fontSize: "44px", marginBottom: "20px" }}>✨</div>
-            <h3 style={{ fontSize: "19px", fontWeight: "600", marginBottom: "16px", color: "#fff", letterSpacing: "1px" }}>系统已确认</h3>
-            <p style={{ color: "#a1a1aa", fontSize: "14px", marginBottom: "36px", lineHeight: "1.6", letterSpacing: "0.5px" }}>{successMsg}</p>
-            <button onClick={() => setSuccessMsg("")} style={{ width: "100%", padding: "16px", borderRadius: "16px", background: "linear-gradient(135deg, #fff 0%, #e4e4e7 100%)", color: "#000", border: "none", fontSize: "15px", fontWeight: "600", cursor: "pointer", letterSpacing: "1px", boxShadow: "0 4px 15px rgba(255,255,255,0.1)" }}>
-              开启创作之旅
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1001, padding: "20px" }}>
+          <div style={{ background: "rgba(15,15,15,0.9)", border: "1px solid rgba(255,255,255,0.08)", width: "100%", maxWidth: "300px", padding: "40px 30px", borderRadius: "20px", textAlign: "center" }}>
+            <div style={{ fontSize: "32px", marginBottom: "24px", color: "#e4e4e7" }}>✦</div>
+            <h3 style={{ fontSize: "16px", fontWeight: "400", marginBottom: "16px", color: "#fff", letterSpacing: "2px" }}>系统确认</h3>
+            <p style={{ color: "#a1a1aa", fontSize: "12px", marginBottom: "36px", lineHeight: "1.8", letterSpacing: "1px" }}>{successMsg}</p>
+            <button onClick={() => setSuccessMsg("")} style={{ width: "100%", padding: "16px", borderRadius: "10px", background: "#fff", color: "#000", border: "none", fontSize: "13px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}>
+              开始创作
             </button>
           </div>
         </div>
       )}
 
       {/* 进度条遮罩层 */}
-      {loading && (<div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.92)", backdropFilter: "blur(10px)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 999 }}><div style={{ width: "85%", maxWidth: "400px", textAlign: "center" }}><div style={{ fontSize: "72px", fontWeight: "300", color: "#fff", marginBottom: "16px", fontFamily: "monospace", letterSpacing: "-2px" }}>{progress}%</div><p style={{ color: "#a1a1aa", fontSize: "15px", marginBottom: "40px", height: "20px", letterSpacing: "1px" }}>{statusText}</p><div style={{ background: "rgba(255,255,255,0.1)", height: "4px", borderRadius: "2px", overflow: "hidden" }}><div style={{ height: "100%", background: "#fff", width: `${progress}%`, transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)", boxShadow: "0 0 10px rgba(255,255,255,0.5)" }}></div></div></div></div>)}
+      {loading && (<div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.92)", backdropFilter: "blur(10px)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 999 }}><div style={{ width: "85%", maxWidth: "400px", textAlign: "center" }}><div style={{ fontSize: "64px", fontWeight: "200", color: "#fff", marginBottom: "16px", fontFamily: "Helvetica Neue, Arial", letterSpacing: "-2px" }}>{progress}%</div><p style={{ color: "#a1a1aa", fontSize: "12px", marginBottom: "40px", height: "20px", letterSpacing: "2px" }}>{statusText}</p><div style={{ background: "rgba(255,255,255,0.05)", height: "2px", overflow: "hidden" }}><div style={{ height: "100%", background: "#fff", width: `${progress}%`, transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)" }}></div></div></div></div>)}
     </main>
   );
 }
