@@ -8,7 +8,7 @@ export default function Home() {
   const [credits, setCredits] = useState(0);           
   
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showPayModal, setShowPayModal] = useState(false); // 🚀 新增：收银台弹窗状态
+  const [showPayModal, setShowPayModal] = useState(false);
   
   const [phoneInput, setPhoneInput] = useState("");
   const [smsInput, setSmsInput] = useState("");
@@ -26,24 +26,19 @@ export default function Home() {
 
   const statusMessages = ["正在分配云端算力...", "正在解析品牌调性...", "正在构建基础轮廓...", "正在融合定制元素...", "正在进行细节打磨...", "图片即将生成，请稍候..."];
 
-  // 🚀 核心升级 1：页面加载时，自动从浏览器本地读取记忆
   useEffect(() => {
     const checkLoginState = async () => {
       const savedPhone = localStorage.getItem("yunxiang_user_phone");
       const loginTime = localStorage.getItem("yunxiang_login_time");
       
       if (savedPhone && loginTime) {
-        // 检查是否超过 3 天 (3天 = 3 * 24 * 60 * 60 * 1000 毫秒)
         const isExpired = new Date().getTime() - parseInt(loginTime) > 3 * 24 * 60 * 60 * 1000;
-        
         if (!isExpired) {
           setUserPhone(savedPhone);
           setIsLoggedIn(true);
-          // 默默去云端查一下最新的真实积分（防止用户在别的手机用掉了）
           const { data } = await supabase.from('users').select('credits').eq('phone', savedPhone).single();
           if (data) setCredits(data.credits);
         } else {
-          // 过期则清理记忆
           localStorage.removeItem("yunxiang_user_phone");
           localStorage.removeItem("yunxiang_login_time");
         }
@@ -115,17 +110,17 @@ export default function Home() {
       setCredits(finalCredits);
       setIsLoggedIn(true);
       setShowAuthModal(false);
-      
-      // 🚀 核心升级 2：将登录状态烙印在浏览器本地（存 3 天）
       localStorage.setItem("yunxiang_user_phone", phoneInput);
       localStorage.setItem("yunxiang_login_time", new Date().getTime().toString());
 
     } catch (e: any) {
-      if (e.code !== 'PGRST116') alert("数据库连接异常，请重试");
+      // 🚀 改进报错：如果真的连不上，把具体原因弹出来
+      if (e.code !== 'PGRST116') {
+        alert("数据库异常: " + (e.message || JSON.stringify(e)));
+      }
     }
   };
 
-  // 🚀 核心升级 3：退出登录功能
   const handleLogout = () => {
     if(confirm("确定要退出登录吗？")) {
       localStorage.removeItem("yunxiang_user_phone");
@@ -136,10 +131,8 @@ export default function Home() {
     }
   };
 
-  // 🚀 核心升级 4：模拟发起支付
   const handleMockPay = (channel: string, amount: number, addCredits: number) => {
     alert(`即将跳转【${channel}】支付 ${amount} 元...\n(当前为搭建阶段，支付成功后将自动到账 ${addCredits} 积分)`);
-    // 演示：假装支付成功并增加积分
     setTimeout(async () => {
       const newBalance = credits + addCredits;
       setCredits(newBalance);
@@ -151,7 +144,7 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!isLoggedIn) return setShowAuthModal(true);
-    if (credits < 10) return setShowPayModal(true); // 积分不够直接弹充值
+    if (credits < 10) return setShowPayModal(true);
     if (!brandName) return alert("请输入品牌名称");
 
     setLoading(true);
@@ -196,7 +189,6 @@ export default function Home() {
   return (
     <main style={{ minHeight: "100vh", backgroundColor: "#000", color: "#fff", padding: "40px 20px", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
       
-      {/* 顶部钱包卡片 */}
       <div style={{ background: "#1a1a1a", padding: "15px 20px", borderRadius: "16px", marginBottom: "40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
@@ -226,11 +218,20 @@ export default function Home() {
       <h1 style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "8px" }}>创作中心</h1>
       <p style={{ color: "#888", fontSize: "14px", marginBottom: "30px" }}>由 GPT-Image-2 驱动的商业级 Logo 引擎</p>
 
-      {/* 表单区域 */}
+      {/* 🚀 修复：加回所有的 placeholder (灰字) */}
       <div style={{ display: "flex", flexDirection: "column", gap: "20px", opacity: loading ? 0.3 : 1, pointerEvents: loading ? "none" : "auto" }}>
-        <div><label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>品牌名称</label><input value={brandName} onChange={(e) => setBrandName(e.target.value)} style={{ width: "100%", background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "16px", color: "#fff", fontSize: "16px" }} /></div>
-        <div><label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>所属行业</label><input value={industry} onChange={(e) => setIndustry(e.target.value)} style={{ width: "100%", background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "16px", color: "#fff", fontSize: "16px" }} /></div>
-        <div><label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>设计元素（选填）</label><input value={elements} onChange={(e) => setElements(e.target.value)} style={{ width: "100%", background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "16px", color: "#fff", fontSize: "16px" }} /></div>
+        <div>
+          <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>品牌名称</label>
+          <input placeholder="例如：云象咖啡" value={brandName} onChange={(e) => setBrandName(e.target.value)} style={{ width: "100%", background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "16px", color: "#fff", fontSize: "16px" }} />
+        </div>
+        <div>
+          <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>所属行业</label>
+          <input placeholder="例如：精品咖啡、科技初创" value={industry} onChange={(e) => setIndustry(e.target.value)} style={{ width: "100%", background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "16px", color: "#fff", fontSize: "16px" }} />
+        </div>
+        <div>
+          <label style={{ display: "block", color: "#666", fontSize: "12px", marginBottom: "8px", marginLeft: "4px" }}>设计元素（选填）</label>
+          <input placeholder="大象, 云朵" value={elements} onChange={(e) => setElements(e.target.value)} style={{ width: "100%", background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "16px", color: "#fff", fontSize: "16px" }} />
+        </div>
         <button onClick={handleGenerate} style={{ marginTop: "20px", padding: "18px", borderRadius: "12px", background: "#fff", color: "#000", border: "none", fontSize: "16px", fontWeight: "bold", cursor: "pointer" }}>🚀 开始生成 {isLoggedIn ? "(消耗 10 积分)" : "(新用户首单免费)"}</button>
       </div>
 
@@ -241,7 +242,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 登录弹窗 */}
       {showAuthModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000, padding: "20px" }}>
           <div style={{ background: "#161616", border: "1px solid #222", width: "100%", maxWidth: "360px", padding: "30px 24px", borderRadius: "24px", position: "relative" }}>
@@ -258,7 +258,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🚀 终极商业化：充值收银台弹窗 */}
       {showPayModal && (
         <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "flex-end", zIndex: 1000 }}>
           <div style={{ background: "#161616", width: "100%", maxWidth: "500px", padding: "30px 20px 50px 20px", borderTopLeftRadius: "24px", borderTopRightRadius: "24px", position: "relative" }}>
@@ -266,45 +265,21 @@ export default function Home() {
             <h3 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "4px" }}>💎 补充算力积分</h3>
             <p style={{ color: "#666", fontSize: "13px", marginBottom: "24px" }}>高昂的 GPU 算力成本，需要您的支持</p>
             
-            {/* 套餐卡片 */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
               <div style={{ border: "1px solid #eab308", background: "rgba(234, 179, 8, 0.1)", borderRadius: "16px", padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: "16px", fontWeight: "bold", color: "#eab308", marginBottom: "4px" }}>新人体验包 (5次)</div>
-                  <div style={{ fontSize: "12px", color: "#888" }}>包含 50 积分</div>
-                </div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button onClick={() => handleMockPay("微信", 9.9, 50)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>微信 ￥9.9</button>
-                  <button onClick={() => handleMockPay("支付宝", 9.9, 50)} style={{ background: "#1677ff", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>支付宝</button>
-                </div>
+                <div><div style={{ fontSize: "16px", fontWeight: "bold", color: "#eab308", marginBottom: "4px" }}>新人体验包 (5次)</div><div style={{ fontSize: "12px", color: "#888" }}>包含 50 积分</div></div>
+                <div style={{ display: "flex", gap: "8px" }}><button onClick={() => handleMockPay("微信", 9.9, 50)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>微信 ￥9.9</button><button onClick={() => handleMockPay("支付宝", 9.9, 50)} style={{ background: "#1677ff", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>支付宝</button></div>
               </div>
-
               <div style={{ border: "1px solid #333", background: "#0a0a0a", borderRadius: "16px", padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ fontSize: "16px", fontWeight: "bold", color: "#fff", marginBottom: "4px" }}>创业标准版 (20次)</div>
-                  <div style={{ fontSize: "12px", color: "#888" }}>包含 200 积分，高性价比</div>
-                </div>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button onClick={() => handleMockPay("微信", 29.9, 200)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>微信 ￥29.9</button>
-                  <button onClick={() => handleMockPay("支付宝", 29.9, 200)} style={{ background: "#1677ff", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>支付宝</button>
-                </div>
+                <div><div style={{ fontSize: "16px", fontWeight: "bold", color: "#fff", marginBottom: "4px" }}>创业标准版 (20次)</div><div style={{ fontSize: "12px", color: "#888" }}>包含 200 积分，高性价比</div></div>
+                <div style={{ display: "flex", gap: "8px" }}><button onClick={() => handleMockPay("微信", 29.9, 200)} style={{ background: "#05c160", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>微信 ￥29.9</button><button onClick={() => handleMockPay("支付宝", 29.9, 200)} style={{ background: "#1677ff", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "bold" }}>支付宝</button></div>
               </div>
             </div>
             <p style={{ color: "#555", fontSize: "11px", textAlign: "center" }}>支付即代表同意《云象服务协议》，虚拟商品购买后不支持退款。</p>
           </div>
         </div>
       )}
-
-      {/* 进度条遮罩层 */}
-      {loading && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 999 }}>
-          <div style={{ width: "85%", maxWidth: "400px", textAlign: "center" }}>
-            <div style={{ fontSize: "64px", fontWeight: "bold", color: "#fff", marginBottom: "10px", fontFamily: "monospace" }}>{progress}%</div>
-            <p style={{ color: "#888", fontSize: "14px", marginBottom: "30px", height: "20px" }}>{statusText}</p>
-            <div style={{ background: "#222", height: "6px", borderRadius: "3px", overflow: "hidden" }}><div style={{ height: "100%", background: "#fff", width: `${progress}%`, transition: "width 0.4s ease-out" }}></div></div>
-          </div>
-        </div>
-      )}
+      {loading && (<div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", background: "rgba(0,0,0,0.92)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", zIndex: 999 }}><div style={{ width: "85%", maxWidth: "400px", textAlign: "center" }}><div style={{ fontSize: "64px", fontWeight: "bold", color: "#fff", marginBottom: "10px", fontFamily: "monospace" }}>{progress}%</div><p style={{ color: "#888", fontSize: "14px", marginBottom: "30px", height: "20px" }}>{statusText}</p><div style={{ background: "#222", height: "6px", borderRadius: "3px", overflow: "hidden" }}><div style={{ height: "100%", background: "#fff", width: `${progress}%`, transition: "width 0.4s ease-out" }}></div></div></div></div>)}
     </main>
   );
 }
