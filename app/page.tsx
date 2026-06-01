@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabase";
+import Link from "next/link"; // 🚪 拼图 1：引入任意门组件
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
@@ -205,9 +206,20 @@ export default function Home() {
           </div>
           
           {isLoggedIn ? (
-            <button onClick={() => setShowPayModal(true)} style={{ padding: "10px 18px", background: "rgba(255,255,255,0.05)", color: "#e4e4e7", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px", transition: "all 0.3s ease" }}>
-              汲取灵感
-            </button>
+            // 🚪 拼图 2：当你登录后，右上角会并排显示“汲取灵感”和“中控台”两个高奢按钮
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              <button onClick={() => setShowPayModal(true)} style={{ padding: "10px 18px", background: "rgba(255,255,255,0.05)", color: "#e4e4e7", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px", transition: "all 0.3s ease" }}>
+                汲取灵感
+              </button>
+              
+              <Link 
+                href="/dashboard"
+                style={{ display: "flex", alignItems: "center", gap: "6px", padding: "10px 16px", background: "#fff", color: "#000", borderRadius: "10px", textDecoration: "none", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}
+              >
+                <div style={{ width: "14px", height: "14px", borderRadius: "50%", background: "linear-gradient(135deg, #a1a1aa 0%, #3f3f46 100%)" }}></div>
+                中控台
+              </Link>
+            </div>
           ) : (
             <button onClick={() => setShowAuthModal(true)} style={{ padding: "10px 18px", background: "#fff", color: "#000", border: "none", borderRadius: "10px", fontSize: "12px", fontWeight: "500", cursor: "pointer", letterSpacing: "1px" }}>
               登录体验
